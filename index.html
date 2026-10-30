@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10131d">
+  <title>TokenLens — LLM Observability Studio</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="/">
+        <span class="brand-mark"><svg viewBox="0 0 36 36" aria-hidden="true"><path d="M5 18 18 5l13 13-13 13L5 18Z"/><circle cx="18" cy="18" r="5"/></svg></span>
+        <span><b>token<span>lens</span></b><small>LLM OBSERVABILITY</small></span>
+      </a>
+      <div class="side-label">WORKSPACE</div>
+      <a class="nav-item active" href="#overview"><span class="nav-icon">◫</span> Overview <span class="nav-dot"></span></a>
+      <a class="nav-item" href="#playground"><span class="nav-icon">⌘</span> Prompt lab</a>
+      <a class="nav-item" href="#history"><span class="nav-icon">↗</span> Request history</a>
+      <div class="side-label side-label-spaced">INSIGHTS</div>
+      <a class="nav-item" href="#usage"><span class="nav-icon">▥</span> Token analytics</a>
+      <a class="nav-item" href="#cost"><span class="nav-icon">◎</span> Cost explorer</a>
+      <div class="sidebar-bottom">
+        <div class="status-card"><span class="status-pulse"></span><div><b id="connectionTitle">Local workspace</b><small id="connectionText">Demo mode · ready</small></div></div>
+        <div class="user-row"><div class="avatar">TL</div><div><b>Developer workspace</b><small>Personal project</small></div><span class="more">•••</span></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="crumb">Workspace <span>/</span> <b>Overview</b></div>
+        <div class="top-actions"><span class="date-chip"><span class="tiny-dot"></span> Live telemetry</span><button class="icon-btn" title="Refresh data" id="refreshBtn">↻</button><div class="avatar top-avatar">TL</div></div>
+      </header>
+
+      <section class="page-head" id="overview">
+        <div><div class="eyebrow"><span class="eyebrow-line"></span> LLM PERFORMANCE CENTER</div><h1>See every token.<br><em>Understand every cost.</em></h1><p class="subhead">A clear view of your model usage, response speed, and spend — all in one place.</p></div>
+        <a class="primary-btn" href="#playground"><span>＋</span> Analyze a prompt</a>
+      </section>
+
+      <section class="notice" id="modeNotice"><span class="notice-icon">i</span><div><b id="modeNoticeTitle">Checking API configuration…</b><span id="modeNoticeText">Checking whether an API key is configured on the local server.</span></div><a href="#setup">Setup guide ↗</a></section>
+
+      <section class="metric-grid" aria-label="Usage metrics">
+        <article class="metric-card"><div class="metric-top"><span>Total requests</span><span class="metric-icon violet">↗</span></div><div class="metric-value" id="requestsMetric">0</div><div class="metric-foot"><span class="muted">Last 100 requests</span><span class="mini-tag neutral">SESSION</span></div><div class="sparkline spark-violet"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></article>
+        <article class="metric-card"><div class="metric-top"><span>Total tokens</span><span class="metric-icon blue">⌘</span></div><div class="metric-value" id="tokensMetric">0</div><div class="metric-foot"><span class="muted">Input + output tokens</span><span class="mini-tag blue-tag">VOLUME</span></div><div class="sparkline spark-blue"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></article>
+        <article class="metric-card"><div class="metric-top"><span>Estimated spend</span><span class="metric-icon green">$</span></div><div class="metric-value" id="costMetric">$0.0000</div><div class="metric-foot"><span class="muted">USD · pricing estimate</span><span class="mini-tag green-tag">COST</span></div><div class="sparkline spark-green"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></article>
+        <article class="metric-card"><div class="metric-top"><span>Avg. latency</span><span class="metric-icon amber">◷</span></div><div class="metric-value" id="latencyMetric">0 <small>ms</small></div><div class="metric-foot"><span class="muted">End-to-end response time</span><span class="mini-tag amber-tag">SPEED</span></div><div class="sparkline spark-amber"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel chart-panel" id="usage">
+          <div class="panel-head"><div><h2>Token consumption</h2><p>Input vs. output across recent requests</p></div><span class="panel-pill">RECENT ACTIVITY</span></div>
+          <div class="legend"><span><i class="legend-dot input-dot"></i> Input tokens</span><span><i class="legend-dot output-dot"></i> Output tokens</span></div>
+          <div class="chart-wrap"><canvas id="tokenChart" aria-label="Input and output token chart"></canvas><div class="chart-empty" id="chartEmpty">Run a prompt to start building your analytics.</div></div>
+          <div class="chart-foot"><span>Most recent requests</span><span class="chart-foot-right"><i></i> Stored locally</span></div>
+        </article>
+        <article class="panel cost-panel" id="cost">
+          <div class="panel-head"><div><h2>Spend breakdown</h2><p>Estimated model usage cost</p></div><span class="circle-icon">$</span></div>
+          <div class="donut-wrap"><div class="donut" id="costDonut"><div class="donut-center"><small>TOTAL SPEND</small><b id="donutCost">$0.00</b><span>USD</span></div></div></div>
+          <div class="cost-legend"><div><span class="legend-label"><i class="legend-dot input-dot"></i> Input cost</span><b id="inputCost">$0.000000</b></div><div><span class="legend-label"><i class="legend-dot output-dot"></i> Output cost</span><b id="outputCost">$0.000000</b></div></div>
+          <div class="cost-note"><span>↗</span><div><b>Keep spend in context</b><p>Costs use the local model rate table. Confirm current provider pricing before budgeting.</p></div></div>
+        </article>
+      </section>
+
+      <section class="panel playground-panel" id="playground">
+        <div class="panel-head playground-head"><div><div class="eyebrow"><span class="eyebrow-line"></span> INTERACTIVE WORKSPACE</div><h2>Prompt lab</h2><p>Run a live request or preview the metrics workflow in demo mode.</p></div><span class="lab-badge"><span class="status-pulse"></span> READY TO ANALYZE</span></div>
+        <form id="promptForm">
+          <label for="promptInput">YOUR PROMPT <span>Up to 12,000 characters</span></label>
+          <textarea id="promptInput" maxlength="12000" placeholder="Example: Explain retrieval-augmented generation in three concise bullet points..." required></textarea>
+          <div class="form-bottom"><span id="charCount">0 / 12,000 characters</span><div class="form-controls"><label class="select-label" for="modelSelect">MODEL</label><select id="modelSelect"><option value="gpt-4o-mini">GPT-4o mini</option><option value="gpt-4o">GPT-4o</option><option value="gpt-4.1-mini">GPT-4.1 mini</option><option value="gpt-4.1-nano">GPT-4.1 nano</option></select><label class="select-label" for="maxTokens">MAX OUTPUT</label><select id="maxTokens"><option value="100">100 tokens</option><option value="180" selected>180 tokens</option><option value="350">350 tokens</option><option value="700">700 tokens</option></select><button class="primary-btn run-btn" id="runBtn" type="submit"><span>▶</span> Analyze prompt</button></div></div>
+        </form>
+        <div class="result-box" id="resultBox" hidden><div class="result-heading"><span class="result-check">✓</span><div><b>Request analyzed</b><small id="resultMode">Demo measurement</small></div><button class="icon-btn close-result" id="closeResult" type="button">×</button></div><div class="result-stats"><div><small>INPUT TOKENS</small><b id="resultInput">—</b></div><div><small>OUTPUT TOKENS</small><b id="resultOutput">—</b></div><div><small>LATENCY</small><b id="resultLatency">—</b></div><div><small>EST. COST</small><b id="resultCost">—</b></div></div><div class="response-preview"><small>RESPONSE PREVIEW</small><p id="responseText"></p><span id="pricingNote"></span></div></div>
+        <div class="error-box" id="errorBox" hidden></div>
+      </section>
+
+      <section class="panel history-panel" id="history">
+        <div class="panel-head"><div><h2>Recent requests</h2><p>Your latest prompt analysis records, stored in a local SQLite database.</p></div><button class="text-btn" id="clearHistoryBtn">Clear history <span>↗</span></button></div>
+        <div class="table-scroll"><table><thead><tr><th>REQUEST</th><th>MODEL</th><th>TOKENS</th><th>LATENCY</th><th>EST. COST</th><th>MODE</th></tr></thead><tbody id="historyBody"><tr><td colspan="6" class="empty-row">No requests yet. Run a prompt above to get started.</td></tr></tbody></table></div>
+      </section>
+      <footer id="setup"><div class="footer-brand"><span class="brand-mark small-mark">◈</span><b>tokenlens</b><span>LLM observability, made understandable.</span></div><div>Local-first demo · <a href="README.md" target="_blank">Setup documentation</a></div></footer>
+    </main>
+  </div>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
